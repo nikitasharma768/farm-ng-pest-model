@@ -220,3 +220,6 @@ __marimo__/
 # Dataset - too large for GitHub
 data/raw/
 data/processed/
+data/processed_subset/
+runs/
+*.pt
