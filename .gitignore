@@ -222,5 +222,6 @@ data/raw/
 data/processed/
 data/binary_processed/
 data/processed_subset/
+data/*.tar.gz
 runs/
 *.pt
