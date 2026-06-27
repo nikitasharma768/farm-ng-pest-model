@@ -184,8 +184,8 @@ def main():
     n_test_neg += n_topup
     print(f"  test/not_insect available: {n_test_neg}")
 
-    print(f"\nBalancing test split: sampling {n_test_neg} insect images to match...")
-    n_test = copy_insect_images(test_imgs, OUT_DIR / "test" / "insect", max_images=n_test_neg)
+    print("\nUsing full IP102 test set (not balancing) - imbalance is fine, will use F1 score")
+    n_test = copy_insect_images(test_imgs, OUT_DIR / "test" / "insect", max_images=None)
     print(f"  test/insect:      {n_test}")
     print(f"  test/not_insect:  {n_test_neg}")
 
