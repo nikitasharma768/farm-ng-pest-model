@@ -16,7 +16,6 @@ This is the complete system as it would run on the farm-ng Amiga:
 The pipeline also works without trap detection (direct scan mode):
   pass --skip_trap_detection to run Stage A and B directly on the image.
 """
-
 import argparse
 from pathlib import Path
 from ultralytics import YOLO
@@ -199,6 +198,7 @@ def main():
     print(f"\nProcessing {len(image_paths)} image(s)...\n")
     results = pipeline.classify_batch(image_paths)
 
+    # Print per-image results to terminal
     for r in results:
         name = Path(r["image"]).name
         if r["stage_reached"] == "no_trap_found":
@@ -218,6 +218,40 @@ def main():
     print(f"  Insects found  : {n_insect}/{n_trap} trap images")
     print(f"  Species IDed   : {n_insect} images passed to species model")
 
+    # Save JSON detection log for heatmap input
+    from datetime import datetime
+    import json
+
+    log_entries = []
+    for i, r in enumerate(results):
+        entry = {
+            "trap_id": f"trap_{i+1:02d}",
+            "image": Path(r["image"]).name,
+            "latitude": 34.0522 + (i * 0.0003),  # placeholder until real GPS
+            "longitude": -117.2437 + (i * 0.0002),
+            "trap_detected": r["trap_detected"],
+            "insect_count": 1 if r["is_insect"] else 0,
+            "detections": (
+                [{"species": r["species"],
+                  "confidence": r["species_confidence"]}]
+                if r["is_insect"] else []
+            )
+        }
+        log_entries.append(entry)
+
+    log = {
+        "run_timestamp": datetime.now().isoformat(),
+        "total_images": len(results),
+        "traps_detected": n_trap,
+        "insects_found": n_insect,
+        "results": log_entries
+    }
+
+    log_path = Path("results/detection_log.json")
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(log_path, "w") as f:
+        json.dump(log, f, indent=2)
+    print(f"\nDetection log saved to {log_path}")
 
 if __name__ == "__main__":
     main()
