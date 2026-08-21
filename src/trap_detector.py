@@ -29,6 +29,9 @@ YELLOW_UPPER = np.array([40, 255, 255])
 BLUE_LOWER = np.array([100, 20, 80])
 BLUE_UPPER = np.array([130, 255, 255])
 
+WHITE_LOWER = np.array([0, 0, 200])
+WHITE_UPPER = np.array([180, 30, 255])
+
 # Minimum and maximum contour area (in pixels) to be considered a trap.
 # Filters out noise (too small) and irrelevant large yellow regions (too large).
 MIN_TRAP_AREA = 5000
@@ -67,7 +70,8 @@ def detect_trap(image_path, debug=False):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     yellow_mask = cv2.inRange(hsv, YELLOW_LOWER, YELLOW_UPPER)
     blue_mask = cv2.inRange(hsv, BLUE_LOWER, BLUE_UPPER)
-    mask = cv2.bitwise_or(yellow_mask, blue_mask)
+    white_mask = cv2.inRange(hsv, WHITE_LOWER, WHITE_UPPER)
+    mask = cv2.bitwise_or(yellow_mask, cv2.bitwise_or(blue_mask, white_mask))
 
     # Clean up the mask with morphological operations to fill holes
     # and remove small noise specks before finding contours
